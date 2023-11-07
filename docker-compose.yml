@@ -13,8 +13,8 @@ services:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/London
       - HOST=0.0.0.0
-      - USER=${USER}
-      - PW=${PW}
+      - USER=${ENV_USER}
+      - PW=${ENV_PW}
     ports:
       - "8191:8191"
     restart: unless-stopped
