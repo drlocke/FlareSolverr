@@ -475,7 +475,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         for statusTxt in statusTxts:
             keyValue = statusTxt.split('=')
             status[keyValue[0]] = keyValue[1]
-        challenge_res.status = status["code"]
+        challenge_res.status = int(status["code"])
         challenge_res.response = status["text"]
 
     res.result = challenge_res
