@@ -23,7 +23,7 @@ def serve(port):
 
 
 def start_metrics_http_server(prometheus_port: int):
-    logging.info(f"Serving Prometheus exporter on http://0.0.0.0:{prometheus_port}/metrics")
+    logging.info(f"Serving Prometheus exporter on http://127.0.0.1:{prometheus_port}/metrics")
     from threading import Thread
     Thread(
         target=serve,

@@ -236,7 +236,7 @@ This is the same as `request.get` but it takes one more param:
 | BROWSER_TIMEOUT    | 40000                  | If you are experiencing errors/timeouts because your system is slow, you can try to increase this value. Remember to increase the `maxTimeout` parameter too. |
 | TEST_URL           | https://www.google.com | FlareSolverr makes a request on start to make sure the web browser is working. You can change that URL if it is blocked in your country.                      |
 | PORT               | 8191                   | Listening port. You don't need to change this if you are running on Docker.                                                                                   |
-| HOST               | 0.0.0.0                | Listening interface. You don't need to change this if you are running on Docker.                                                                              |
+| HOST               | 127.0.0.1                | Listening interface. You don't need to change this if you are running on Docker.                                                                              |
 | PROMETHEUS_ENABLED | false                  | Enable Prometheus exporter. See the Prometheus section below.                                                                                                 |
 | PROMETHEUS_PORT    | 8192                   | Listening port for Prometheus exporter. See the Prometheus section below.                                                                                     |
 

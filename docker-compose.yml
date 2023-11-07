@@ -12,6 +12,7 @@ services:
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/London
+      - HOST=127.0.0.1
     ports:
       - "8192:8191"
     depends_on:
