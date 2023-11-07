@@ -216,13 +216,13 @@ Example response from running the `curl` above:
 }
 ```
 
-### + `request.post`
+### + `request.post`, `request.put`, `request.patch`, `request.delete` 
 
 This is the same as `request.get` but it takes one more param:
 
 | Parameter | Notes                                                                    |
 |-----------|--------------------------------------------------------------------------|
-| postData  | Must be a string with `application/x-www-form-urlencoded`. Eg: `a=b&c=d` |
+| postData  | JSON                                                                     |
 
 ## Environment variables
 
