@@ -469,9 +469,14 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         challenge_res.headers = {}  # todo: fix, selenium not provides this info
         challenge_res.response = driver.page_source
 
-    if fetchResponse != None:
-        challenge_res.status = fetchResponse.status
-        challenge_res.response = fetchResponse.text
+    if fetchResponse != None and fetchResponse.status:
+        status = {}
+        statusTxts = str(fetchResponse.status).split(" ")
+        for statusTxt in statusTxts:
+            keyValue = statusTxt.split('=')
+            status[keyValue[0]] = keyValue[1]
+        challenge_res.status = status["code"]
+        challenge_res.response = status["text"]
 
     res.result = challenge_res
     return res
