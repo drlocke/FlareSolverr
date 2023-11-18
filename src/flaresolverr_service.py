@@ -511,12 +511,17 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         statusTxts = str(fetchResponse.status).split(" ")
         for statusTxt in statusTxts:
             keyValue = statusTxt.split('=')
+            if len(keyValue[1]) == "''":
+                keyValue[1] = ""
             status[keyValue[0]] = keyValue[1]
         challenge_res.status = int(status["code"])
-        if len(status["text"]) > 0:
+        if "test" in status and len(status["text"]) > 0:
             challenge_res.response = status["text"]
         else:
             challenge_res.response = fetchResponse.text
+    
+    logging.info("response.status: " + str(challenge_res.status))
+    logging.info("response: " + str(challenge_res.response))
 
     res.result = challenge_res
     return res
@@ -583,9 +588,9 @@ def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
 
     options = Options(method=method, headers=headers, body=req.postData)
     response = fetch(driver, req.apiUrl, options)
-    logging.info("response: " + str(response))
-    logging.info("response.status: " + str(response.status))
-    logging.info("response.text: " + str(response.text))
+    logging.info("fetchResponse: " + str(response))
+    logging.info("fetchResponse.status: " + str(response.status))
+    logging.info("fetchResponse.text: " + str(response.text))
 
     driver.start_session()  # required to bypass Cloudflare
     return response
