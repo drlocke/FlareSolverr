@@ -513,7 +513,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
             keyValue = statusTxt.split('=')
             status[keyValue[0]] = keyValue[1]
         challenge_res.status = int(status["code"])
-        if challenge_res.status != 200 and len(status["text"]) > 0:
+        if len(status["text"]) > 0:
             challenge_res.response = status["text"]
         else:
             challenge_res.response = fetchResponse.text
