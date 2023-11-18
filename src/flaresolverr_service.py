@@ -520,8 +520,8 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         else:
             challenge_res.response = fetchResponse.text
     
-    logging.info("response.status: " + str(challenge_res.status))
-    logging.info("response: " + str(challenge_res.response))
+    # logging.info("response.status: " + str(challenge_res.status))
+    # logging.info("response: " + str(challenge_res.response))
 
     res.result = challenge_res
     return res
