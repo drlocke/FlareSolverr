@@ -414,8 +414,9 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         # elif method == 'DELETE':
         #     fetchResponse = _delete_request(req, driver)
         # else:
-        driver.get(req.url)
-        driver.start_session()  # required to bypass Cloudflare
+        if method == 'GET':
+            driver.get(req.url)
+            driver.start_session()  # required to bypass Cloudflare
 
     # wait for the page
     if utils.get_config_log_html():
