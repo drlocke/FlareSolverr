@@ -70,8 +70,7 @@ def test_browser_installation():
         logging.error("Chrome / Chromium version not detected!")
         sys.exit(1)
     else:
-        logging.info("Chrome / Chromium major version: " +
-                     chrome_major_version)
+        logging.info("Chrome / Chromium major version: " + chrome_major_version)
 
     logging.info("Launching web browser...")
     user_agent = utils.get_user_agent()
@@ -95,8 +94,7 @@ def health_endpoint() -> HealthResponse:
 
 def controller_v1_endpoint(req: V1RequestBase) -> V1ResponseBase:
     start_ts = int(time.time() * 1000)
-    logging.info(
-        f"Incoming request => POST /v1 body: {utils.object_to_dict(req)}")
+    logging.info(f"Incoming request => POST /v1 body: {utils.object_to_dict(req)}")
     res: V1ResponseBase
     try:
         res = _controller_v1_handler(req)
@@ -111,8 +109,7 @@ def controller_v1_endpoint(req: V1RequestBase) -> V1ResponseBase:
     res.endTimestamp = int(time.time() * 1000)
     res.version = utils.get_flaresolverr_version()
     logging.debug(f"Response => POST /v1 body: {utils.object_to_dict(res)}")
-    logging.info(
-        f"Response in {(res.endTimestamp - res.startTimestamp) / 1000} s")
+    logging.info(f"Response in {(res.endTimestamp - res.startTimestamp) / 1000} s")
     return res
 
 
@@ -121,11 +118,9 @@ def _controller_v1_handler(req: V1RequestBase) -> V1ResponseBase:
     if req.cmd is None:
         raise Exception("Request parameter 'cmd' is mandatory.")
     if req.headers is not None:
-        logging.warning(
-            "Request parameter 'headers' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'headers' was removed in FlareSolverr v2.")
     if req.userAgent is not None:
-        logging.warning(
-            "Request parameter 'userAgent' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'userAgent' was removed in FlareSolverr v2.")
 
     # set default values
     if req.maxTimeout is None or req.maxTimeout < 1:
@@ -158,16 +153,13 @@ def _controller_v1_handler(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_request_get(req: V1RequestBase) -> V1ResponseBase:
     # do some validations
     if req.url is None:
-        raise Exception(
-            "Request parameter 'url' is mandatory in 'request.get' command.")
+        raise Exception("Request parameter 'url' is mandatory in 'request.get' command.")
     if req.postData is not None:
         raise Exception("Cannot use 'postBody' when sending a GET request.")
     if req.returnRawHtml is not None:
-        logging.warning(
-            "Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
     if req.download is not None:
-        logging.warning(
-            "Request parameter 'download' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'GET')
     res = V1ResponseBase({})
@@ -180,14 +172,11 @@ def _cmd_request_get(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_request_post(req: V1RequestBase) -> V1ResponseBase:
     # do some validations
     if req.postData is None:
-        raise Exception(
-            "Request parameter 'postData' is mandatory in 'request.post' command.")
+        raise Exception("Request parameter 'postData' is mandatory in 'request.post' command.")
     if req.returnRawHtml is not None:
-        logging.warning(
-            "Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
     if req.download is not None:
-        logging.warning(
-            "Request parameter 'download' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'POST')
     res = V1ResponseBase({})
@@ -200,14 +189,11 @@ def _cmd_request_post(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_request_put(req: V1RequestBase) -> V1ResponseBase:
     # do some validations
     if req.postData is None:
-        raise Exception(
-            "Request parameter 'postData' is mandatory in 'request.put' command.")
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
     if req.returnRawHtml is not None:
-        logging.warning(
-            "Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
     if req.download is not None:
-        logging.warning(
-            "Request parameter 'download' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'PUT')
     res = V1ResponseBase({})
@@ -220,14 +206,11 @@ def _cmd_request_put(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_request_patch(req: V1RequestBase) -> V1ResponseBase:
     # do some validations
     if req.postData is None:
-        raise Exception(
-            "Request parameter 'postData' is mandatory in 'request.put' command.")
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
     if req.returnRawHtml is not None:
-        logging.warning(
-            "Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
     if req.download is not None:
-        logging.warning(
-            "Request parameter 'download' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'PATCH')
     res = V1ResponseBase({})
@@ -240,14 +223,11 @@ def _cmd_request_patch(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_request_delete(req: V1RequestBase) -> V1ResponseBase:
     # do some validations
     if req.postData is None:
-        raise Exception(
-            "Request parameter 'postData' is mandatory in 'request.put' command.")
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
     if req.returnRawHtml is not None:
-        logging.warning(
-            "Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
     if req.download is not None:
-        logging.warning(
-            "Request parameter 'download' was removed in FlareSolverr v2.")
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'DELETE')
     res = V1ResponseBase({})
@@ -260,8 +240,7 @@ def _cmd_request_delete(req: V1RequestBase) -> V1ResponseBase:
 def _cmd_sessions_create(req: V1RequestBase) -> V1ResponseBase:
     logging.debug("Creating new session...")
 
-    session, fresh = SESSIONS_STORAGE.create(
-        session_id=req.session, proxy=req.proxy)
+    session, fresh = SESSIONS_STORAGE.create(session_id=req.session, proxy=req.proxy)
     session_id = session.session_id
 
     if not fresh:
@@ -307,32 +286,26 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
     try:
         if req.session:
             session_id = req.session
-            ttl = timedelta(
-                minutes=req.session_ttl_minutes) if req.session_ttl_minutes else None
+            ttl = timedelta(minutes=req.session_ttl_minutes) if req.session_ttl_minutes else None
             session, fresh = SESSIONS_STORAGE.get(session_id, ttl)
 
             if fresh:
-                logging.debug(
-                    f"new session created to perform the request (session_id={session_id})")
+                logging.debug(f"new session created to perform the request (session_id={session_id})")
             else:
                 logging.debug(f"existing session is used to perform the request (session_id={session_id}, "
                               f"lifetime={str(session.lifetime())}, ttl={str(ttl)})")
 
             logging.info('Existing instance of webdriver will be used to perform the request')
             driver = session.driver
-
-        if driver is None:
+        else:
             logging.info('New instance of webdriver has been created to perform the request')
             driver = utils.get_webdriver(req.proxy)
         
-        driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
-        raise Exception(
-            f'Error solving the challenge. Timeout after {timeout} seconds.')
+        raise Exception(f'Error solving the challenge. Timeout after {timeout} seconds.')
     except Exception as e:
-        raise Exception('Error solving the challenge. ' +
-                        str(e).replace('\n', '\\n'))
+        raise Exception('Error solving the challenge. ' + str(e).replace('\n', '\\n'))
     finally:
         if not req.session and driver is not None:
             driver.quit()
@@ -342,8 +315,7 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
 def click_verify(driver: WebDriver):
     try:
         logging.debug("Try to find the Cloudflare verify checkbox...")
-        iframe = driver.find_element(
-            By.XPATH, "//iframe[starts-with(@id, 'cf-chl-widget-')]")
+        iframe = driver.find_element(By.XPATH, "//iframe[starts-with(@id, 'cf-chl-widget-')]")
         driver.switch_to.frame(iframe)
         checkbox = driver.find_element(
             by=By.XPATH,
@@ -361,8 +333,7 @@ def click_verify(driver: WebDriver):
         driver.switch_to.default_content()
 
     try:
-        logging.debug(
-            "Try to find the Cloudflare 'Verify you are human' button...")
+        logging.debug("Try to find the Cloudflare 'Verify you are human' button...")
         button = driver.find_element(
             by=By.XPATH,
             value="//input[@type='button' and @value='Verify you are human']",
@@ -372,11 +343,9 @@ def click_verify(driver: WebDriver):
             actions.move_to_element_with_offset(button, 5, 7)
             actions.click(button)
             actions.perform()
-            logging.debug(
-                "The Cloudflare 'Verify you are human' button found and clicked!")
+            logging.debug("The Cloudflare 'Verify you are human' button found and clicked!")
     except Exception:
-        logging.debug(
-            "The Cloudflare 'Verify you are human' button not found on the page.")
+        logging.debug("The Cloudflare 'Verify you are human' button not found on the page.")
 
     time.sleep(2)
 
@@ -392,7 +361,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
 
     if method == 'GET':
         driver.get(req.url)
-        # driver.start_session()  # required to bypass Cloudflare
+        driver.start_session()  # required to bypass Cloudflare
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -403,7 +372,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         # reload the page
         if method == 'GET':
             driver.get(req.url)
-            # driver.start_session()  # required to bypass Cloudflare
+            driver.start_session()  # required to bypass Cloudflare
     
     # execute fetch call
     if method == 'POST':
@@ -456,17 +425,13 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
                 attempt = attempt + 1
                 # wait until the title changes
                 for title in CHALLENGE_TITLES:
-                    logging.debug(
-                        "Waiting for title (attempt " + str(attempt) + "): " + title)
-                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(
-                        title_is(title))
+                    logging.debug("Waiting for title (attempt " + str(attempt) + "): " + title)
+                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(title_is(title))
 
                 # then wait until all the selectors disappear
                 for selector in CHALLENGE_SELECTORS:
-                    logging.debug(
-                        "Waiting for selector (attempt " + str(attempt) + "): " + selector)
-                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(
-                        presence_of_element_located((By.CSS_SELECTOR, selector)))
+                    logging.debug("Waiting for selector (attempt " + str(attempt) + "): " + selector)
+                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(presence_of_element_located((By.CSS_SELECTOR, selector)))
 
                 # all elements not found
                 break
@@ -483,8 +448,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         logging.debug("Waiting for redirect")
         # noinspection PyBroadException
         try:
-            WebDriverWait(driver, SHORT_TIMEOUT).until(
-                staleness_of(html_element))
+            WebDriverWait(driver, SHORT_TIMEOUT).until(staleness_of(html_element))
         except Exception:
             logging.debug("Timeout waiting for redirect")
 
