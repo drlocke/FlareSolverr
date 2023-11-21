@@ -318,15 +318,16 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
                 logging.debug(f"existing session is used to perform the request (session_id={session_id}, "
                               f"lifetime={str(session.lifetime())}, ttl={str(ttl)})")
 
+            logging.info('Existing instance of webdriver will be used to perform the request')
             driver = session.driver
-            
-        if driver == None:
+
+        if driver is None:
+            logging.info('New instance of webdriver has been created to perform the request')
             driver = utils.get_webdriver(req.proxy)
-            logging.debug(
-                'New instance of webdriver has been created to perform the request')
+            driver.start_session()
         
         if driver.session_id == None:
-                driver.start_session()
+            driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
         raise Exception(
@@ -337,7 +338,7 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
     finally:
         if not req.session and driver is not None:
             driver.quit()
-            logging.debug('A used instance of webdriver has been destroyed')
+            logging.info('A used instance of webdriver has been destroyed')
 
 
 def click_verify(driver: WebDriver):
