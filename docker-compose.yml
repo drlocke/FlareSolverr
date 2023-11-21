@@ -15,7 +15,7 @@ services:
       - HOST=0.0.0.0
       - USER=${ENV_USER}
       - PW=${ENV_PW}
-      - LOG_LEVEL=info
+      #- LOG_LEVEL=debug
     ports:
       - "8191:8191"
     restart: unless-stopped
