@@ -324,10 +324,8 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
         if driver is None:
             logging.info('New instance of webdriver has been created to perform the request')
             driver = utils.get_webdriver(req.proxy)
-            driver.start_session()
         
-        if driver.session_id == None:
-            driver.start_session()
+        driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
         raise Exception(
