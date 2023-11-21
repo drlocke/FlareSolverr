@@ -297,10 +297,13 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
 
             logging.info('Existing instance of webdriver will be used to perform the request')
             driver = session.driver
-        else:
+
+        if driver is None:
             logging.info('New instance of webdriver has been created to perform the request')
             driver = utils.get_webdriver(req.proxy)
         
+        if driver.session_id == None:
+            driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
         raise Exception(f'Error solving the challenge. Timeout after {timeout} seconds.')
@@ -361,7 +364,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
 
     if method == 'GET':
         driver.get(req.url)
-        driver.start_session()  # required to bypass Cloudflare
+        # driver.start_session()  # required to bypass Cloudflare
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -372,7 +375,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         # reload the page
         if method == 'GET':
             driver.get(req.url)
-            driver.start_session()  # required to bypass Cloudflare
+            # driver.start_session()  # required to bypass Cloudflare
     
     # execute fetch call
     if method == 'POST':
@@ -554,7 +557,7 @@ def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
     logging.info("fetchResponse.status: " + str(response.status))
     logging.info("fetchResponse.text: " + str(response.text))
 
-    driver.start_session()  # required to bypass Cloudflare
+    # driver.start_session()  # required to bypass Cloudflare
     return response
 
 
