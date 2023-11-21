@@ -319,7 +319,8 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
                               f"lifetime={str(session.lifetime())}, ttl={str(ttl)})")
 
             driver = session.driver
-        else:
+            
+        if driver == None:
             driver = utils.get_webdriver(req.proxy)
             logging.debug(
                 'New instance of webdriver has been created to perform the request')
