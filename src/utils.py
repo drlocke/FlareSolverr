@@ -126,7 +126,7 @@ def get_webdriver(proxy: dict = None, session_id = None) -> WebDriver:
     if session_id is not None:
         userDirPath = './home/flaresolverr/chrome_profiles/' + str(session_id)
         if not os.path.isdir(userDirPath):
-            logging.debug('> Create user data dir: ' + userDirPath)
+            logging.info('> Create user data dir: ' + userDirPath)
             os.makedirs(userDirPath)
         options.add_argument('--user-data-dir=' + userDirPath)
     # todo: this param shows a warning in chrome head-full
