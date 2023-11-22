@@ -112,7 +112,7 @@ def create_proxy_extension(proxy: dict) -> str:
     return proxy_extension_dir
 
 
-def get_webdriver(proxy: dict = None) -> WebDriver:
+def get_webdriver(proxy: dict = None, session_id = None) -> WebDriver:
     global PATCHED_DRIVER_PATH, USER_AGENT
     logging.debug('Launching web browser...')
 
@@ -120,6 +120,11 @@ def get_webdriver(proxy: dict = None) -> WebDriver:
     options = uc.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--window-size=1920,1080')
+    # more
+    options.add_argument("--disable-application-cache")
+    options.add_argument('--enable-javascript')
+    if session_id is not None:
+        options.add_argument('--user-data-dir=/home/flaresolverr/chrome_profiles/' + str(session_id))
     # todo: this param shows a warning in chrome head-full
     options.add_argument('--disable-setuid-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -249,6 +254,8 @@ def get_chrome_major_version() -> int:
         process.close()
 
     CHROME_MAJOR_VERSION = complete_version.split('.')[0].split(' ')[-1]
+    # filter for digits only
+    CHROME_MAJOR_VERSION = ''.join(c for c in CHROME_MAJOR_VERSION if c.isdigit())
     logging.info("Using chrome version: " + CHROME_MAJOR_VERSION)
     return CHROME_MAJOR_VERSION
 

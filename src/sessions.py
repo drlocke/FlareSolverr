@@ -45,7 +45,7 @@ class SessionsStorage:
         if self.exists(session_id):
             return self.sessions[session_id], False
 
-        driver = utils.get_webdriver(proxy)
+        driver = utils.get_webdriver(proxy, session_id)
         created_at = datetime.now()
         session = Session(session_id, driver, created_at)
 
@@ -73,7 +73,7 @@ class SessionsStorage:
         session, fresh = self.create(session_id)
 
         if ttl is not None and not fresh and session.lifetime() > ttl:
-            logging.debug(f'session\'s lifetime has expired, so the session is recreated (session_id={session_id})')
+            logging.info(f'session\'s lifetime has expired, so the session is recreated (session_id={session_id})')
             session, fresh = self.create(session_id, force_new=True)
 
         return session, fresh
