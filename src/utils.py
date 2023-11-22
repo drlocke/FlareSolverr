@@ -258,7 +258,7 @@ def get_chrome_major_version() -> int:
         process.close()
 
     versionStr = complete_version.split('.')[0].split(' ')[-1]
-    if versionStr is not '':
+    if versionStr != '':
         # filter for digits only
         CHROME_MAJOR_VERSION = int(''.join(c for c in versionStr if c.isdigit()))
     logging.info("Using chrome version: " + str(CHROME_MAJOR_VERSION))
