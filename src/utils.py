@@ -11,7 +11,7 @@ import undetected_chromedriver as uc
 
 FLARESOLVERR_VERSION = None
 CHROME_EXE_PATH = None
-CHROME_MAJOR_VERSION = None
+CHROME_MAJOR_VERSION = 0
 USER_AGENT = None
 XVFB_DISPLAY = None
 PATCHED_DRIVER_PATH = None
@@ -169,7 +169,7 @@ def get_webdriver(proxy: dict = None, session_id = None) -> WebDriver:
 
     # if we are inside the Docker container, we avoid downloading the driver
     driver_exe_path = None
-    version_main = None
+    version_main = 0
     if os.path.exists("/app/chromedriver"):
         # running inside Docker
         driver_exe_path = "/app/chromedriver"
@@ -257,7 +257,7 @@ def get_chrome_major_version() -> int:
     # filter for digits only
     CHROME_MAJOR_VERSION = ''.join(c for c in CHROME_MAJOR_VERSION if c.isdigit())
     logging.info("Using chrome version: " + CHROME_MAJOR_VERSION)
-    return CHROME_MAJOR_VERSION
+    return int(CHROME_MAJOR_VERSION)
 
 
 def extract_version_nt_executable(exe_path: str) -> str:
