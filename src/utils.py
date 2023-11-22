@@ -123,8 +123,12 @@ def get_webdriver(proxy: dict = None, session_id = None) -> WebDriver:
     # more
     options.add_argument("--disable-application-cache")
     options.add_argument('--enable-javascript')
-    # if session_id is not None:
-    #     options.add_argument('--user-data-dir=./home/flaresolverr/chrome_profiles/' + str(session_id))
+    if session_id is not None:
+        userDirPath = './home/flaresolverr/chrome_profiles/' + str(session_id)
+        if not os.path.isdir(userDirPath):
+            logging.debug('> Create user data dir: ' + userDirPath)
+            os.makedirs(userDirPath)
+        options.add_argument('--user-data-dir=' + userDirPath)
     # todo: this param shows a warning in chrome head-full
     options.add_argument('--disable-setuid-sandbox')
     options.add_argument('--disable-dev-shm-usage')

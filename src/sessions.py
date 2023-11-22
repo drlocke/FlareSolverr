@@ -1,4 +1,5 @@
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
@@ -66,7 +67,9 @@ class SessionsStorage:
             return False
 
         session = self.sessions.pop(session_id)
+        session.driver.close()
         session.driver.quit()
+        time.sleep(3)
         return True
 
     def get(self, session_id: str, ttl: Optional[timedelta] = None) -> Tuple[Session, bool]:
