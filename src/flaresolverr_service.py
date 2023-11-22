@@ -364,7 +364,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
 
     if method == 'GET':
         driver.get(req.url)
-        # driver.start_session()  # required to bypass Cloudflare
+        driver.start_session()  # required to bypass Cloudflare
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -375,7 +375,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         # reload the page
         if method == 'GET':
             driver.get(req.url)
-            # driver.start_session()  # required to bypass Cloudflare
+            driver.start_session()  # required to bypass Cloudflare
     
     # execute fetch call
     if method == 'POST':
@@ -526,7 +526,7 @@ def _post_request_old(req: V1RequestBase, driver: WebDriver):
 
 def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
     driver.get(req.url)
-    # driver.start_session()
+    driver.start_session()
 
     headers = {
         "user-agent": get_browser_user_agent(driver),
@@ -557,7 +557,7 @@ def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
     logging.info("fetchResponse.status: " + str(response.status))
     logging.info("fetchResponse.text: " + str(response.text))
 
-    # driver.start_session()  # required to bypass Cloudflare
+    driver.start_session()  # required to bypass Cloudflare
     return response
 
 
