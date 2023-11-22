@@ -232,7 +232,7 @@ def get_chrome_exe_path() -> str:
 
 def get_chrome_major_version() -> int:
     global CHROME_MAJOR_VERSION
-    if CHROME_MAJOR_VERSION is not None:
+    if CHROME_MAJOR_VERSION is not None and CHROME_MAJOR_VERSION > 0:
         return CHROME_MAJOR_VERSION
 
     if os.name == 'nt':
@@ -253,11 +253,12 @@ def get_chrome_major_version() -> int:
         complete_version = process.read()
         process.close()
 
-    CHROME_MAJOR_VERSION = complete_version.split('.')[0].split(' ')[-1]
-    # filter for digits only
-    CHROME_MAJOR_VERSION = ''.join(c for c in CHROME_MAJOR_VERSION if c.isdigit())
+    versionStr = complete_version.split('.')[0].split(' ')[-1]
+    if versionStr is not '':
+        # filter for digits only
+        CHROME_MAJOR_VERSION = int(''.join(c for c in versionStr if c.isdigit()))
     logging.info("Using chrome version: " + str(CHROME_MAJOR_VERSION))
-    return int(CHROME_MAJOR_VERSION)
+    return CHROME_MAJOR_VERSION
 
 
 def extract_version_nt_executable(exe_path: str) -> str:
