@@ -124,7 +124,7 @@ def _controller_v1_handler(req: V1RequestBase) -> V1ResponseBase:
 
     # set default values
     if req.maxTimeout is None or req.maxTimeout < 1:
-        req.maxTimeout = 60000
+        req.maxTimeout = 600000 #10 mins
 
     # execute the command
     res: V1ResponseBase
@@ -302,7 +302,7 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
         
         if driver.session_id == None:
             logging.info('> Driver session was None. Start new one.')
-            driver.start_session()
+            # driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
         raise Exception(f'Error solving the challenge. Timeout after {timeout} seconds.')
@@ -365,7 +365,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
 
     if method == 'GET':
         driver.get(req.url)
-        driver.start_session()  # required to bypass Cloudflare
+        # driver.start_session()  # required to bypass Cloudflare
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -376,7 +376,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         # reload the page
         if method == 'GET':
             driver.get(req.url)
-            driver.start_session()  # required to bypass Cloudflare
+            # driver.start_session()  # required to bypass Cloudflare
     
     # execute fetch call
     if method == 'POST':
@@ -522,12 +522,12 @@ def _post_request_old(req: V1RequestBase, driver: WebDriver):
         </body>
         </html>"""
     driver.get("data:text/html;charset=utf-8," + html_content)
-    driver.start_session()  # required to bypass Cloudflare
+    # driver.start_session()  # required to bypass Cloudflare
 
 
 def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
     driver.get(req.url)
-    driver.start_session()
+    # driver.start_session()
 
     headers = {
         "user-agent": get_browser_user_agent(driver),
@@ -558,7 +558,7 @@ def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
     logging.info("fetchResponse.status: " + str(response.status))
     logging.info("fetchResponse.text: " + str(response.text))
 
-    driver.start_session()  # required to bypass Cloudflare
+    # driver.start_session()  # required to bypass Cloudflare
     return response
 
 
