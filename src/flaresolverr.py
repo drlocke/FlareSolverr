@@ -4,7 +4,7 @@ import os
 import sys
 
 import certifi
-from bottle import run, response, Bottle, request, ServerAdapter
+from bottle import run, response, Bottle, request, ServerAdapter, auth_basic
 
 from bottle_plugins.error_plugin import error_plugin
 from bottle_plugins.logger_plugin import logger_plugin
@@ -25,8 +25,11 @@ class JSONErrorBottle(Bottle):
 
 app = JSONErrorBottle()
 
+def is_authenticated_user(user, password):
+    return user == os.environ["USER"] and password == os.environ['PW']
 
 @app.route('/')
+@auth_basic(is_authenticated_user)
 def index():
     """
     Show welcome message
@@ -36,6 +39,7 @@ def index():
 
 
 @app.route('/health')
+@auth_basic(is_authenticated_user)
 def health():
     """
     Healthcheck endpoint.
@@ -46,6 +50,7 @@ def health():
 
 
 @app.post('/v1')
+@auth_basic(is_authenticated_user)
 def controller_v1():
     """
     Controller v1
@@ -78,7 +83,7 @@ if __name__ == "__main__":
     log_level = os.environ.get('LOG_LEVEL', 'info').upper()
     log_html = utils.get_config_log_html()
     headless = utils.get_config_headless()
-    server_host = os.environ.get('HOST', '0.0.0.0')
+    server_host = os.environ.get('HOST', '127.0.0.1')
     server_port = int(os.environ.get('PORT', 8191))
 
     # configure logger

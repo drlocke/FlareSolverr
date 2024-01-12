@@ -2,14 +2,23 @@
 version: "2.1"
 services:
   flaresolverr:
-    # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: drlocke/flaresolverr:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     container_name: flaresolverr
     environment:
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_MAX_SESSIONS=50000
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/London
+      - HOST=0.0.0.0
+      - USER=${ENV_USER}
+      - PW=${ENV_PW}
+      #- LOG_LEVEL=debug
     ports:
-      - "${PORT:-8191}:8191"
+      - "8191:8191"
     restart: unless-stopped
+

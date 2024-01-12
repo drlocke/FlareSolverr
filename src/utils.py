@@ -11,7 +11,7 @@ import undetected_chromedriver as uc
 
 FLARESOLVERR_VERSION = None
 CHROME_EXE_PATH = None
-CHROME_MAJOR_VERSION = None
+CHROME_MAJOR_VERSION = 0
 USER_AGENT = None
 XVFB_DISPLAY = None
 PATCHED_DRIVER_PATH = None
@@ -112,7 +112,7 @@ def create_proxy_extension(proxy: dict) -> str:
     return proxy_extension_dir
 
 
-def get_webdriver(proxy: dict = None) -> WebDriver:
+def get_webdriver(proxy: dict = None, session_id = None) -> WebDriver:
     global PATCHED_DRIVER_PATH, USER_AGENT
     logging.debug('Launching web browser...')
 
@@ -120,6 +120,15 @@ def get_webdriver(proxy: dict = None) -> WebDriver:
     options = uc.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--window-size=1920,1080')
+    # more
+    options.add_argument("--disable-application-cache")
+    options.add_argument('--enable-javascript')
+    if session_id is not None:
+        userDirPath = './home/flaresolverr/chrome_profiles/' + str(session_id)
+        if not os.path.isdir(userDirPath):
+            logging.info('> Create user data dir: ' + userDirPath)
+            os.makedirs(userDirPath)
+        options.add_argument('--user-data-dir=' + userDirPath)
     # todo: this param shows a warning in chrome head-full
     options.add_argument('--disable-setuid-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -166,7 +175,7 @@ def get_webdriver(proxy: dict = None) -> WebDriver:
 
     # if we are inside the Docker container, we avoid downloading the driver
     driver_exe_path = None
-    version_main = None
+    version_main = 0
     if os.path.exists("/app/chromedriver"):
         # running inside Docker
         driver_exe_path = "/app/chromedriver"
@@ -227,9 +236,9 @@ def get_chrome_exe_path() -> str:
     return CHROME_EXE_PATH
 
 
-def get_chrome_major_version() -> str:
+def get_chrome_major_version() -> int:
     global CHROME_MAJOR_VERSION
-    if CHROME_MAJOR_VERSION is not None:
+    if CHROME_MAJOR_VERSION is not None and CHROME_MAJOR_VERSION > 0:
         return CHROME_MAJOR_VERSION
 
     if os.name == 'nt':
@@ -250,7 +259,11 @@ def get_chrome_major_version() -> str:
         complete_version = process.read()
         process.close()
 
-    CHROME_MAJOR_VERSION = complete_version.split('.')[0].split(' ')[-1]
+    versionStr = complete_version.split('.')[0].split(' ')[-1]
+    if versionStr != '':
+        # filter for digits only
+        CHROME_MAJOR_VERSION = int(''.join(c for c in versionStr if c.isdigit()))
+    logging.info("Using chrome version: " + str(CHROME_MAJOR_VERSION))
     return CHROME_MAJOR_VERSION
 
 

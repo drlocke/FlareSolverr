@@ -5,6 +5,8 @@ import time
 from datetime import timedelta
 from urllib.parse import unquote
 
+from selenium_fetch import fetch, Options, get_browser_user_agent
+
 from func_timeout import FunctionTimedOut, func_timeout
 from selenium.common import TimeoutException
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -27,6 +29,8 @@ ACCESS_DENIED_TITLES = [
     'Attention Required! | Cloudflare'
 ]
 ACCESS_DENIED_SELECTORS = [
+    # Bing
+    'input[id^=cf-chl-widget]:not([value])',
     # Cloudflare
     'div.cf-error-title span.cf-code-label span',
     # Cloudflare http://bitturk.net/ Firefox
@@ -62,11 +66,11 @@ def test_browser_installation():
         logging.info("Chrome / Chromium path: " + chrome_exe_path)
 
     chrome_major_version = utils.get_chrome_major_version()
-    if chrome_major_version == '':
+    if chrome_major_version == None:
         logging.error("Chrome / Chromium version not detected!")
         sys.exit(1)
     else:
-        logging.info("Chrome / Chromium major version: " + chrome_major_version)
+        logging.info("Chrome / Chromium major version: " + str(chrome_major_version))
 
     logging.info("Launching web browser...")
     user_agent = utils.get_user_agent()
@@ -120,7 +124,7 @@ def _controller_v1_handler(req: V1RequestBase) -> V1ResponseBase:
 
     # set default values
     if req.maxTimeout is None or req.maxTimeout < 1:
-        req.maxTimeout = 60000
+        req.maxTimeout = 600000 #10 mins
 
     # execute the command
     res: V1ResponseBase
@@ -134,6 +138,12 @@ def _controller_v1_handler(req: V1RequestBase) -> V1ResponseBase:
         res = _cmd_request_get(req)
     elif req.cmd == 'request.post':
         res = _cmd_request_post(req)
+    elif req.cmd == 'request.put':
+        res = _cmd_request_put(req)
+    elif req.cmd == 'request.patch':
+        res = _cmd_request_patch(req)
+    elif req.cmd == 'request.delete':
+        res = _cmd_request_delete(req)
     else:
         raise Exception(f"Request parameter 'cmd' = '{req.cmd}' is invalid.")
 
@@ -169,6 +179,57 @@ def _cmd_request_post(req: V1RequestBase) -> V1ResponseBase:
         logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
 
     challenge_res = _resolve_challenge(req, 'POST')
+    res = V1ResponseBase({})
+    res.status = challenge_res.status
+    res.message = challenge_res.message
+    res.solution = challenge_res.result
+    return res
+
+
+def _cmd_request_put(req: V1RequestBase) -> V1ResponseBase:
+    # do some validations
+    if req.postData is None:
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
+    if req.returnRawHtml is not None:
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+    if req.download is not None:
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
+
+    challenge_res = _resolve_challenge(req, 'PUT')
+    res = V1ResponseBase({})
+    res.status = challenge_res.status
+    res.message = challenge_res.message
+    res.solution = challenge_res.result
+    return res
+
+
+def _cmd_request_patch(req: V1RequestBase) -> V1ResponseBase:
+    # do some validations
+    if req.postData is None:
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
+    if req.returnRawHtml is not None:
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+    if req.download is not None:
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
+
+    challenge_res = _resolve_challenge(req, 'PATCH')
+    res = V1ResponseBase({})
+    res.status = challenge_res.status
+    res.message = challenge_res.message
+    res.solution = challenge_res.result
+    return res
+
+
+def _cmd_request_delete(req: V1RequestBase) -> V1ResponseBase:
+    # do some validations
+    if req.postData is None:
+        raise Exception("Request parameter 'postData' is mandatory in 'request.put' command.")
+    if req.returnRawHtml is not None:
+        logging.warning("Request parameter 'returnRawHtml' was removed in FlareSolverr v2.")
+    if req.download is not None:
+        logging.warning("Request parameter 'download' was removed in FlareSolverr v2.")
+
+    challenge_res = _resolve_challenge(req, 'DELETE')
     res = V1ResponseBase({})
     res.status = challenge_res.status
     res.message = challenge_res.message
@@ -229,15 +290,19 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
             session, fresh = SESSIONS_STORAGE.get(session_id, ttl)
 
             if fresh:
-                logging.debug(f"new session created to perform the request (session_id={session_id})")
+                logging.info(f"new session created to perform the request (session_id={session_id})")
             else:
-                logging.debug(f"existing session is used to perform the request (session_id={session_id}, "
+                logging.info(f"existing session is used to perform the request (session_id={session_id}, "
                               f"lifetime={str(session.lifetime())}, ttl={str(ttl)})")
-
             driver = session.driver
-        else:
+
+        if driver is None:
+            logging.info('> New instance of webdriver has been created to perform the request')
             driver = utils.get_webdriver(req.proxy)
-            logging.debug('New instance of webdriver has been created to perform the request')
+        
+        if driver.session_id == None:
+            logging.info('> Driver session was None. Start new one.')
+            # driver.start_session()
         return func_timeout(timeout, _evil_logic, (req, driver, method))
     except FunctionTimedOut:
         raise Exception(f'Error solving the challenge. Timeout after {timeout} seconds.')
@@ -246,7 +311,7 @@ def _resolve_challenge(req: V1RequestBase, method: str) -> ChallengeResolutionT:
     finally:
         if not req.session and driver is not None:
             driver.quit()
-            logging.debug('A used instance of webdriver has been destroyed')
+            logging.info('A used instance of webdriver has been destroyed')
 
 
 def click_verify(driver: WebDriver):
@@ -292,15 +357,13 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
     res.status = STATUS_OK
     res.message = ""
 
+    # driver.start_session(driver.capabilities)
+
+    fetchResponse = None
     # navigate to the page
     logging.debug(f'Navigating to... {req.url}')
-    driver.get(req.url)
-    driver.start_session() # required to bypass Cloudflare
-    if method == 'POST':
-        _post_request(req, driver)
-    else:
-        driver.get(req.url)
-        driver.start_session()  # required to bypass Cloudflare
+    #driver.get(req.url)
+    #driver.start_session()
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -308,12 +371,23 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         for cookie in req.cookies:
             driver.delete_cookie(cookie['name'])
             driver.add_cookie(cookie)
-        # reload the page
-        if method == 'POST':
-            _post_request(req, driver)
-        else:
+        # load page with given cookies
+        if method == 'GET':
             driver.get(req.url)
             driver.start_session()  # required to bypass Cloudflare
+    elif method == 'GET':
+        driver.get(req.url)
+        driver.start_session()  # required to bypass Cloudflare
+    
+    # execute fetch call
+    if method == 'POST':
+        fetchResponse = _post_request(req, driver)
+    elif method == 'PUT':
+        fetchResponse = _put_request(req, driver)
+    elif method == 'PATCH':
+        fetchResponse = _patch_request(req, driver)
+    elif method == 'DELETE':
+        fetchResponse = _delete_request(req, driver)
 
     # wait for the page
     if utils.get_config_log_html():
@@ -362,8 +436,7 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
                 # then wait until all the selectors disappear
                 for selector in CHALLENGE_SELECTORS:
                     logging.debug("Waiting for selector (attempt " + str(attempt) + "): " + selector)
-                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(
-                        presence_of_element_located((By.CSS_SELECTOR, selector)))
+                    WebDriverWait(driver, SHORT_TIMEOUT).until_not(presence_of_element_located((By.CSS_SELECTOR, selector)))
 
                 # all elements not found
                 break
@@ -400,11 +473,28 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         challenge_res.headers = {}  # todo: fix, selenium not provides this info
         challenge_res.response = driver.page_source
 
+    if fetchResponse != None and fetchResponse.status:
+        status = {}
+        statusTxts = str(fetchResponse.status).split(" ")
+        for statusTxt in statusTxts:
+            keyValue = statusTxt.split('=')
+            if len(keyValue[1]) == "''":
+                keyValue[1] = ""
+            status[keyValue[0]] = keyValue[1]
+        challenge_res.status = int(status["code"])
+        if "test" in status and len(status["text"]) > 0:
+            challenge_res.response = status["text"]
+        else:
+            challenge_res.response = fetchResponse.text
+    
+    # logging.info("response.status: " + str(challenge_res.status))
+    # logging.info("response: " + str(challenge_res.response))
+
     res.result = challenge_res
     return res
 
 
-def _post_request(req: V1RequestBase, driver: WebDriver):
+def _post_request_old(req: V1RequestBase, driver: WebDriver):
     post_form = f'<form id="hackForm" action="{req.url}" method="POST">'
     query_string = req.postData if req.postData[0] != '?' else req.postData[1:]
     pairs = query_string.split('&')
@@ -433,4 +523,57 @@ def _post_request(req: V1RequestBase, driver: WebDriver):
         </body>
         </html>"""
     driver.get("data:text/html;charset=utf-8," + html_content)
+    # driver.start_session()  # required to bypass Cloudflare
+
+
+def _fetch_request(method: str, req: V1RequestBase, driver: WebDriver):
+    driver.get(req.url)
+    # driver.start_session()
+
+    headers = {
+        "user-agent": get_browser_user_agent(driver),
+        'origin': req.url,
+        'referer': req.url,
+        'Content-Length': len(req.postData),
+        'Content-Type': 'application/json'
+    }
+
+    if req.headers != None:
+        for header in req.headers:
+            print("+ " + header)
+            headers.update(header)
+
+    cookieStr = ""
+    for cookie in driver.get_cookies():
+        cookieStr += (cookie["name"] + "=" + str(cookie["value"]) + "; ")
+
+    # for cookie in driver.get_cookies():
+    #     cookie.
+    if cookieStr != "":
+        cookieStr = cookieStr[:-2]
+        headers.update({'Cookie': cookieStr})
+
+    options = Options(method=method, headers=headers, body=req.postData)
+    response = fetch(driver, req.apiUrl, options)
+    logging.info("fetchResponse: " + str(response))
+    logging.info("fetchResponse.status: " + str(response.status))
+    logging.info("fetchResponse.text: " + str(response.text))
+
     driver.start_session()  # required to bypass Cloudflare
+    return response
+
+
+def _post_request(req: V1RequestBase, driver: WebDriver):
+    return _fetch_request("POST", req, driver)
+
+
+def _put_request(req: V1RequestBase, driver: WebDriver):
+    return _fetch_request("PUT", req, driver)
+
+
+def _patch_request(req: V1RequestBase, driver: WebDriver):
+    return _fetch_request("PATCH", req, driver)
+
+
+def _delete_request(req: V1RequestBase, driver: WebDriver):
+    return _fetch_request("DELETE", req, driver)
