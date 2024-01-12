@@ -362,8 +362,10 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
     fetchResponse = None
     # navigate to the page
     logging.debug(f'Navigating to... {req.url}')
-    #driver.get(req.url)
-    #driver.start_session()
+
+    if method == 'GET':
+        driver.get(req.url)
+        driver.start_session()  # required to bypass Cloudflare
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
@@ -375,9 +377,6 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
         if method == 'GET':
             driver.get(req.url)
             driver.start_session()  # required to bypass Cloudflare
-    elif method == 'GET':
-        driver.get(req.url)
-        driver.start_session()  # required to bypass Cloudflare
     
     # execute fetch call
     if method == 'POST':
