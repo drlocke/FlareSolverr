@@ -367,6 +367,9 @@ def _evil_logic(req: V1RequestBase, driver: WebDriver, method: str) -> Challenge
 
     # set cookies if required
     if req.cookies is not None and len(req.cookies) > 0:
+        # setting correct context for cookies
+        driver.get(req.apiUrl)
+        driver.start_session()
         logging.debug(f'Setting cookies...')
         for cookie in req.cookies:
             driver.delete_cookie(cookie['name'])
